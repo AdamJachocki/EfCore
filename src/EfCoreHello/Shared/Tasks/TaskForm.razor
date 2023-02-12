@@ -1,0 +1,50 @@
+﻿@using EfCoreHello.Models.Db;
+@using EfCoreHello.ViewModels;
+
+<div>
+    <EditForm Model="TaskData" OnValidSubmit="OnFormSubmitHandler">
+        <div class="mb-3">
+            <label for="title" class="form-label">Nazwa:</label>
+            <InputText @bind-Value="TaskData.Title" id="title" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Opis:</label>
+            <InputText @bind-Value="TaskData.Description" id="description" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="owner" class="form-label">Przypisz do:</label>
+            <InputSelect class="form-control form-select" id="owner" @bind-Value="SelectedUserId">
+                @foreach(var u in Users)
+                {
+                    <option value="@u.Id">@(u.Name)</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Ok</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<UserViewModel> Users { get; set; }
+    [Parameter]
+    public TaskViewModel TaskData { get; set; } = new();
+    [Parameter]
+    public EventCallback<TaskViewModel> OnTaskAdded { get; set; }
+
+    private Guid SelectedUserId { get; set; }
+
+    private async Task OnFormSubmitHandler(EditContext ctx)
+    {
+        TaskData.Status = ToDoItemStatus.NotStarted;
+        TaskData.Owner = Users.Single(x => x.Id == SelectedUserId);
+
+        if (OnTaskAdded.HasDelegate)
+            await OnTaskAdded.InvokeAsync(TaskData);
+    }
+}

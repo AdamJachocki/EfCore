@@ -1,0 +1,16 @@
+﻿@page "/users"
+@using EfCoreHello.Shared.Users
+@inherits UsersPage
+
+<h1>Użytkownicy</h1>
+
+<div class="row">
+    <div class="col-2"><button class="btn btn-primary" @onclick="AddUserClick" disabled="@ShowUserEditor">Dodaj użytkownika...</button></div>
+</div>
+
+<hr />
+@if(ShowUserEditor)
+{
+    <UserForm User="@UserData" OnUpdateUser="OnUpdateUser" />
+}
+
